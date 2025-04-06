@@ -1,0 +1,72 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.jana.functiontracer</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Python Function Tracer</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="alexivan1304@outlook.com">Alexandru-Marian Ivan</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+        PyCharm plugin that provides function execution time profiling using Python's tracing capabilities.
+        <ul>
+            <li>Trace specific functions during debugging</li>
+            <li>Measure execution time with minimal overhead</li>
+            <li>View real-time statistics in a dedicated tool window</li>
+            <li>Supports DAP (Debug Adapter Protocol) integration</li>
+            <li>Works with DebugPy as an optional backend</li>
+        </ul>
+    ]]></description>
+
+    <!-- Define compatibility for PyCharm -->
+    <idea-version since-build="233" until-build="233.*"/>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.python</depends>
+    <depends>com.intellij.modules.pycharm</depends>
+
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Services -->
+        <projectService serviceImplementation="com.jana.functiontracer.service.TracerService"/>
+        <projectService serviceImplementation="com.jana.functiontracer.FunctionTracerProjectService"/>
+        <applicationService serviceImplementation="com.jana.functiontracer.FunctionTracerPlugin"/>
+
+        <!-- Tool Windows -->
+        <toolWindow id="Function Tracer"
+                    secondary="true"
+                    icon="/icons/tracer.svg"
+                    anchor="bottom"
+                    factoryClass="com.jana.functiontracer.ui.TracerToolWindowFactory"/>
+
+        <!-- Debug configuration -->
+        <configurationType implementation="com.jana.functiontracer.debug.FunctionTracerDebugConfigurationType"/>
+
+        <!-- Startup Activities -->
+        <postStartupActivity implementation="com.jana.functiontracer.FunctionTracerPlugin"/>
+    </extensions>
+
+    <actions>
+        <action id="FunctionTracer.ToggleTracingAction"
+                class="com.jana.functiontracer.actions.ToggleTracingAction"
+                text="Toggle Function Tracing"
+                description="Toggle Python function tracing">
+            <add-to-group group-id="ToolbarRunGroup" anchor="after" relative-to-action="RunConfiguration"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl F7"/>
+        </action>
+    </actions>
+
+    <projectListeners>
+        <listener class="com.jana.functiontracer.debug.DebugProcessListener"
+                  topic="com.intellij.xdebugger.XDebuggerManagerListener"/>
+    </projectListeners>
+</idea-plugin>
